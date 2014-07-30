@@ -1,0 +1,33 @@
+<hr/> 
+<p><h4><u>Details of  Error Evaluation </u></h4> </p>
+```{r warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = FALSE, size="small",include=FALSE}
+clength=dim(df)[2]
+y_string=colnames(df)[1]
+if(headero==0)
+{
+  colnames(df)[1]="actual"
+  y_string="actual"
+}
+
+
+out=NULL;
+x=head(df);out=c(out,knit_child(paste(system.file(package="trendsmarket"),"rmd/printdf.Rmd",sep="/")))
+
+for(i in 2:clength)
+{
+  tryCatch({
+    
+ 
+ cnm=paste(y_string,colnames(df)[i],sep="_")
+ df[,cnm]=df[,y_string] -df[,i]
+ errlab=paste ("Error metric for ",y_string, " vs ",colnames(df)[i],sep="")
+ x=errlab;out=c(out,knit_child(paste(system.file(package="trendsmarket"),"rmd/printdefault.Rmd",sep="/")))
+errdf=errorfun(df[,y_string],df[,i])
+x=errdf;out=c(out,knit_child(paste(system.file(package="trendsmarket"),"rmd/printdf.Rmd",sep="/")))
+out = c(out, knit_child(paste(system.file(package="trendsmarket"),"rmd/loopggplot.Rmd",sep="/")))
+ },error=function(x){print(x)})
+  
+}
+
+```
+`r paste(out, collapse='\n')`

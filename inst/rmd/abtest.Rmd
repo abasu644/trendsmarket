@@ -1,0 +1,30 @@
+
+
+```{r warning=FALSE,error=TRUE,echo=F,comment=NA,fig.width = 12 , fig.height = 10,width=120,tidy = FALSE, size="small"}
+
+ tc=read.csv(ab_file,sep="\t")
+ ml=melt(tc, id = c("dt","test_group_id"))
+ ml$dt=as.Date(ml$dt)
+ ml$value=round(as.numeric(ml$value),2)
+```
+<br/>
+<p><b><u>Netrev - Test vs Control</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+  mlf1=ml[ml$variable %in% c("netrev"),]
+  pl<-ggplot()+geom_line(data=mlf1, aes(dt, value,group=test_group_id,colour=test_group_id)   )
+  print(pl)
+```
+<br/>
+<p><b><u>Clicks - Test vs Control</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+ mlf1=ml[ml$variable %in% c("clicks"),]
+ pl<-ggplot()+geom_line(data=mlf1, aes(dt, value,group=test_group_id,colour=test_group_id)   )
+ print(pl)
+```
+<br/>
+<p><b><u>Impressions - Test vs Control</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+ mlf1=ml[ml$variable %in% c("impr"),]
+ pl<-ggplot()+geom_line(data=mlf1, aes(dt, value,group=test_group_id,colour=test_group_id)   )
+ print(pl)
+```

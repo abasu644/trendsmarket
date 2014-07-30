@@ -1,0 +1,61 @@
+
+
+```{r warning=FALSE,error=FALSE,echo=F,comment=NA,fig.width = 12 , fig.height = 10,width=120,tidy = FALSE, size="small"}
+ a=system(paste("grep ",  mktid, paste(" ",base_path,mktdatafile,sep=""),sep=""),intern=T,ignore.stderr=T)
+ dndf=as.data.frame( t(sapply(1:length(a), function(x) strsplit(a, "\t")[[x]])) ) 
+cnm=system(paste("head -1 ",  paste(" ",base_path,mktdatafile,sep=""),sep=""),intern=T,ignore.stderr=T)
+ cnm=unlist(strsplit(cnm, "\t"))
+ colnames(dndf)=cnm
+dndf=dndf[,-length(dndf)]
+#dndf=dndf[,!(colnames(dndf) %in% c("rpc_clust"))]
+ dndf$dte=as.Date(as.character(dndf$dte))
+ dndf=dndf[order(dndf$dte),]
+ dndf=dndf[dndf$dte!='2014-05-27',]
+ dndf[,!(colnames(dndf) %in% c("dte"))]=apply(dndf[,!(colnames(dndf) %in% c("dte"))],2,as.numeric)
+```
+
+<p><b><u> Mkt_id - Characteristics</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+print(paste("Mkt_id -",mktid,
+            "\n",
+            "mctr quality is ",dndf$mctr_synth[1],sep="")) 
+#print(paste("mctr quality is ",dndf$mctr_synth[1]))
+ 
+```
+
+<p><b><u> Time series of mkt_id original traffic data</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=dndf
+colnames(x)[which(colnames(x) == "dte")]="traffic_dte"
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
+<p><b><u> Time series of mkt_id- Finance metric</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+  ml=melt(dndf, id = "dte")
+  mlf1=ml[ml$variable %in% c("revenue","cost","netrev"),]
+  mlf2=ml[ml$variable %in% c("clicks","impr"),]
+ pl<-ggplot()+geom_line(data=mlf1, aes(dte, value,group=variable,colour=variable)   )
+ print(pl)
+```
+
+<p><b><u>Time series of mkt_id - Volume metric</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+  pl<-ggplot()+geom_line(data=mlf2, aes(dte, value,group=variable,colour=variable)   )
+ print(pl)
+```
+
+<p><b><u> Time series of mkt_id - Lemonade Rules</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+ mlf3=ml[ml$variable %in% c("rule_id"),]
+ pl<-ggplot()+geom_point(data=mlf3, aes(dte, value,group=variable,colour=variable)   )
+ print(pl)
+```

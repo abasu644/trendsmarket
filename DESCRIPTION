@@ -1,0 +1,17 @@
+Package: trendsmarket
+Type: Package
+Title: Looks at the trends of important indexes and companies details
+Version: 0.1
+Date: 2014-06-21
+Author: Anirban Basu
+Maintainer: Who to complain to <abasu644@gmail.com>
+Description: More about what it does (maybe more than one line)
+License: Personal
+Imports:
+    lattice,
+    httpRequest,
+    knitr,
+    zoo,
+    ggplot2,
+    reshape2
+    

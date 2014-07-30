@@ -1,0 +1,73 @@
+
+```{r  results='hide',warning=FALSE,error=TRUE,echo=F,message=FALSE,comment=NA}
+
+
+
+mktdata=system(paste("grep ",  mktid, paste(" ",base_path,mktdatafile,sep=""),sep=""),intern=T,ignore.stderr=T)
+dndf=as.data.frame( t(sapply(1:length(mktdata), function(x) strsplit(mktdata, "\t")[[x]])) ) 
+cnm=system(paste("head -1 ",  paste(" ",base_path,mktdatafile,sep=""),sep=""),intern=T,ignore.stderr=T)
+cnm=unlist(strsplit(cnm, "\t"))
+ colnames(dndf)=cnm
+dndf=dndf[,-length(dndf)]
+dndf=dndf[,!(colnames(dndf) %in% c("rpc_clust"))]
+ dndf$dte=as.Date(as.character(dndf$dte))
+dndf=dndf[order(dndf$dte),]
+ dndf=dndf[dndf$dte!='2014-05-27',]
+ dndf[,!(colnames(dndf) %in% c("dte"))]=apply(dndf[,!(colnames(dndf) %in% c("dte"))],2,as.numeric)
+
+
+ run.date = as.Date("3015-06-02")
+ cnm=colnames(read.csv(paste(base_path,"data.csv",sep=""),sep="\t"))
+ a=system(paste("grep ",  mktid, paste(" ",base_path,run_file,sep=""),sep=""),intern=T,ignore.stderr=T)
+ alltraffic.df=as.data.frame( t(sapply(1:length(a), function(x) strsplit(a, "\t")[[x]])) ) 
+ colnames(alltraffic.df)=cnm
+ alltraffic.df$DTE=as.Date(as.character(alltraffic.df$DTE))
+ alltraffic.df=alltraffic.df[alltraffic.df$DTE!='2014-05-27',]
+ alltraffic.df[,!(colnames(alltraffic.df) %in% c("DTE","RF_CODE"))]=apply(alltraffic.df[,!(colnames(alltraffic.df) %in% c("DTE","RF_CODE"))],2,as.numeric)
+ audits.csv = paste("_", run.date,".csv", sep="")
+ mkt.id = mktid
+ rf_code ="gfx"
+ 
+
+traffic_pred=merge(alltraffic.df,dndf[,c("dte","sq_coeff","lin_coeff","intercept","rule_id")],by.y="dte",by.x="DTE")
+traffic_pred$PRED_NETREV=(traffic_pred$MAX_CPC*traffic_pred$MAX_CPC)*traffic_pred$sq_coeff + 
+  traffic_pred$MAX_CPC*traffic_pred$lin_coeff + traffic_pred$intercept
+traffic_pred$ACTUAL_NETREV=traffic_pred$TRREVENUE -traffic_pred$COST
+traffic_pred[,!(colnames(traffic_pred) %in% c("DTE","RF_CODE"))]=apply(traffic_pred[,!(colnames(traffic_pred) %in% c("DTE","RF_CODE"))],2,function(x){round(as.numeric(x),2)})
+traffic_pred=traffic_pred[!duplicated(traffic_pred$DTE),]
+traffic_pred=as.data.frame(traffic_pred)
+```
+
+<p><b><u> Time series of mkt_id original traffic data</u></b></p>
+
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=traffic_pred
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+
+```{r results='asis',fig.width=7, fig.height=6,warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+  pld=traffic_pred
+  pld=pld[order(pld$DTE),]
+  ml=melt(pld, id = "DTE")
+  mlf1=ml[ml$variable %in% c("REVENUE","COST","TRREVENUE","PRED_NETREV","ACTUAL_NETREV"),]
+  mlf2=ml[ml$variable %in% c("CLICKS","IMPR"),]
+  mlf1$set="Finance"
+  mlf2$set="Volume"
+  mlf=rbind(mlf1,mlf2)
+  pl<-ggplot()+geom_line(data=subset(mlf,set=="Volume"),aes(DTE, value,group=variable,colour=variable))+
+  geom_line(data=subset(mlf,set=="Finance"),aes(DTE, value,group=variable,colour=variable))+facet_grid(set ~ .     ,scales="free_y")
+  print(pl)
+```
+
+```{r warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+quadratic.fn(mkt.id, rf_code, run.date,alltraffic.df)
+```
+<br/>

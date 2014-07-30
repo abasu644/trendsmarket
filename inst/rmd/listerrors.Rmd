@@ -1,0 +1,49 @@
+<script>
+$("a.linky").on('click', function () {
+        var clickedID = $(this).attr('id');
+         $("a.linky").attr( 'class', 'disabled' );
+        var req2 = ocpu.call("retrieveerror", {
+	        									          "eid": clickedID
+	  	  										        }, function(session)
+	  	  										        	{
+                                         	session.getFile("retrieveerror_temp.html",function(outtxt)
+	  	  										         			{
+
+	  	  												 	             $("#errordetails").html(outtxt);
+                                                $("a.linky").attr( 'class', 'enabled' );
+	  	  											         		});
+	  	  									    	});
+
+	         req2.fail(function(){
+	                alert("Server error: " + req2.responseText);
+	  	          });
+          return(false);
+        
+ 
+	  });
+</script>
+<hr/> 
+<p><h4><u>List of Errors</u></h4> </p>
+```{r warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = FALSE, size="small",include=FALSE}
+
+out=NULL;
+df=data.frame()
+library(RMySQL)
+con <- dbConnect(MySQL(), user="ds", host="10.101.64.136",password="ds",dbname ="lemonade")
+  query <- function(...) dbGetQuery(con, ...)
+  tryCatch({
+    
+    rs <- dbSendQuery(con, paste("select * from  error_metrics where rf_code like '%",searchtext,"%' or description like '%",searchtext,"%'",sep=""))
+    data <- fetch(rs)
+    #data$link= paste(" <a href='/ocpu/library/trendsmarket/R/retrieveerror?eid=",data$eid,"' > Click </a> ",sep="")
+   data$link= paste(" <a href='#' class='linky' id='",data$eid,"' > Click </a> ",sep="")
+    x=(data);out=c(out,knit_child(paste(system.file(package="trendsmarket"),"rmd/printdf.Rmd",sep="/")))
+       
+  },error=function(x){print(x)},
+  finally ={
+    dbDisconnect(con)
+  })
+
+
+```
+`r paste(out, collapse='\n')`

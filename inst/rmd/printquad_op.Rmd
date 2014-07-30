@@ -1,0 +1,25 @@
+
+
+```{r warning=FALSE,error=FALSE,echo=F,comment=NA,fig.width = 12 , fig.height = 10,width=120,tidy = FALSE, size="small"}
+ a=system(paste("grep ",  mktid, paste(" ",base_path,"data_analysis_mktid_rule_1-5.tsv",sep=""),sep=""),intern=T,ignore.stderr=T)
+ dndf=as.data.frame( t(sapply(1:length(a), function(x) strsplit(a, "\t")[[x]])) ) 
+cnm=system(paste("head -1 ",  paste(" ",base_path,"data_analysis_mktid_rule_1-5.tsv",sep=""),sep=""),intern=T,ignore.stderr=T)
+ cnm=unlist(strsplit(cnm, "\t"))
+ colnames(dndf)=cnm
+dndf=dndf[,-length(dndf)]
+dndf=dndf[,!(colnames(dndf) %in% c("rpc_clust"))]
+ dndf$dte=as.Date(as.character(dndf$dte))
+ dndf=dndf[order(dndf$dte),]
+ dndf=dndf[dndf$dte!='2014-05-27',]
+ dndf[,!(colnames(dndf) %in% c("dte"))]=apply(dndf[,!(colnames(dndf) %in% c("dte"))],2,as.numeric)
+```
+
+<p><b><u> Mkt_id - Characteristics</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+print(paste("Mkt_id -",mktid,
+            "\n",
+            "mctr quality is ",dndf$mctr_synth[1],sep="")) 
+#print(paste("mctr quality is ",dndf$mctr_synth[1]))
+ 
+```
+

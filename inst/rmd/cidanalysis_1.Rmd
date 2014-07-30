@@ -1,0 +1,52 @@
+---
+title: "dummy_data_july12_gfx"
+author: "India_DS"
+date: "Monday, July 14, 2014"
+output: html_document
+---
+
+
+```{r warning=FALSE}
+#loading of data produced from dummy_query.sh for 12th july
+dd<- read.csv("D:\\Work\\AB\\dummy_data__2014-07-12_gfx.data",sep="\t")  
+
+#transforming variables from  factor to numeric 
+dd[,c("rpc_cid","rpc_t","rpc_rf")]=apply(dd[,c("rpc_cid","rpc_t","rpc_rf")],2,function(x) {
+  round(as.numeric(as.character(x)),2)
+})
+
+#removing NA's
+ddootc <- dd[!is.na(dd$rpc_cid) & !is.na(dd$rpc_t) ,]
+ddootr <- dd[!is.na(dd$rpc_rf) & !is.na(dd$rpc_t) ,]
+
+#summary of rpc 
+summary(ddootc$rpc_t) #actual
+summary(ddootc$rpc_cid) #cid
+summary(ddootc$rpc_rf) #rf
+
+
+#plot
+par(mfrow=c(2,2))
+hist(ddootc$rpc_cid,main="rpc_cid",xlab="rpc_cid")
+hist(ddootc$rpc_rf,main="rpc_rf",xlab="rpc_rf")
+hist(ddootc$rpc_t,main="rpc_actual",xlab="rpc_t")
+
+#error function
+errorfun<-function(actual,predicted,q=seq(0,1,.1)){
+  error <- predicted-actual
+  rmse <- sqrt(crossprod(error) / length(error))
+  rmset <- mean(error^2,trim=0.01)
+  mape <- abs(error)/actual
+  bias <- error/actual
+  ##dec <- do.call('rbind',by(actual,quantcut(predicted,q),summary))
+  sumup <- c(med=median(error),rmse=rmse, range=max(error)-min(error),
+             rmset=rmset)
+  return(sumup)
+}
+
+#error computation
+errorfun(ddootc$rpc_t,ddootc$rpc_cid) #actual vs cid
+errorfun(ddootc$rpc_t,ddootc$rpc_rf)  #actual vs rf
+```
+
+

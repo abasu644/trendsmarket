@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <title>Bidding  Analysis</title>
+    <script src="opencpu/jquery-1.10.2.min.js"></script>
+	    <script src="opencpu/opencpu-0.4.js"></script>
+
+    <script>
+   	$(document).ready(function(){
+      var req = ocpu.call("getmetadata", {
+          }, function(session){
+           $("#csvlink").attr("href", session.getLoc() + "R/.val/csv")
+          $("#jsonlink").attr("href", session.getLoc() + "R/.val/json")
+         });
+
+        //if R returns an error, alert the error message
+        req.fail(function(){
+          alert("Server error: " + req.responseText);
+        });
+
+        //after request complete, re-enable the button
+        req.always(function(){
+          $("#submitbutton").removeAttr("disabled")
+        });
+
+    });
+    </script>
+  </head>
+
+  <body>
+    <h1>Bidding  Analysis</h1>
+
+    <p>
+      The  purpose of this Bidding  Analysis tool is to analyze the performance of rf_codes,mkt_id or other groups of mkt_id over time.Various dimensions-which includes bid placed,predicted rpc of mkt_id,quality,volume, finance,etc of these group are being looked at to analyze present bidding algo and also compare them with other competing algos.
+    </p>
+
+    <h2>Tools</h2>
+
+    <p>Each tool consists of a web page having data,plots pertaining to rf_codes,mkt_id or other groups of mkt_id.</p>
+
+    <ol>
+      <li><a href="mktidanalysis.html">Market Id Analysis</a></li>
+      <li><a href="quadmodel.html">Quadratic Modeling</a></li>
+      <li><a href="erroranalysis.html">Calculate Errors(RMSE,etc)</a></li>
+      <li><a href="abtest.html">A/B Test Results</a></li>
+      <li><a href="cidanalysis.html">CID Analysis</a></li>
+    </ol>
+
+    <p>Timestamp of Dataset Used</p>
+    <ol>
+	      <li><a target="_blank" id="jsonlink">json</a></li>
+	      <li><a target="_blank" id="csvlink">csv</a></li>
+	</ol>
+
+
+<!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://abasu644.piwikpro.com/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 1]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="http://abasu644.piwikpro.com/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+  </body>
+</html>

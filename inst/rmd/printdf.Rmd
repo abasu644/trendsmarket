@@ -1,0 +1,13 @@
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x),type="html",include.rownames=FALSE,quote=F,sanitize.text.function = force)
+```
+<br/>
+

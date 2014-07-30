@@ -1,0 +1,4 @@
+<p>Quadratic model Result  is </p>
+```{r warning=FALSE,error=FALSE,echo=F,comment=NA,fig.width = 12 , fig.height = 10,width=120,tidy = FALSE, size="small"}
+print(quadres)
+```

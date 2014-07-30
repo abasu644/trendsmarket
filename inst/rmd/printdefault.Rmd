@@ -1,0 +1,6 @@
+<b>
+```{r warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = FALSE, size="large"}
+cat(x)
+cat("\n")
+```
+</b>

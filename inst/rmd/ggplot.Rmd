@@ -1,0 +1,4 @@
+<p> Time series of market id data </p>
+```{r  warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = FALSE}
+print.ggplot.orig(x)
+```

@@ -1,0 +1,56 @@
+
+<hr/> 
+<p><h4><u>Details of  Error Evaluation </u></h4> </p>
+```{r warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = FALSE, size="small",include=FALSE}
+
+out=NULL;
+df=data.frame()
+library(RMySQL)
+con <- dbConnect(MySQL(), user="ds", host="10.101.64.136",password="ds",dbname ="lemonade")
+  query <- function(...) dbGetQuery(con, ...)
+  tryCatch({
+    
+    rs <- dbSendQuery(con, paste("select * from  error_metrics where eid=",eid))
+    data <- fetch(rs)
+    x=(data);out=c(out,knit_child(paste(system.file(package="trendsmarket"),"rmd/printdf.Rmd",sep="/")))
+    
+    rs <- dbSendQuery(con, paste("select * from  error_metrics_colmn where eid=",eid))
+    clmns <- fetch(rs)
+    
+    rs <- dbSendQuery(con, paste("select * from  error_metrics_data where eid=",eid))
+    df <- fetch(rs)
+    df=df[,-1]
+    colnames(df)=clmns[,"colmn"]
+    
+  },error=function(x){print(x)},
+  finally ={
+    dbDisconnect(con)
+  })
+
+clength=dim(df)[2]
+y_string=colnames(df)[1]
+
+
+
+x=head(df);out=c(out,knit_child(paste(system.file(package="trendsmarket"),"rmd/printdf.Rmd",sep="/")))
+
+for(i in 2:clength)
+{
+  tryCatch({
+    
+ if(!is.na(colnames(df)[i]))
+   {
+      cnm=paste(y_string,colnames(df)[i],sep="_")
+      df[,cnm]=df[,y_string] -df[,i]
+      errlab=paste ("Error metric for ",y_string, " vs ",colnames(df)[i],sep="")
+      x=errlab;out=c(out,knit_child(paste(system.file(package="trendsmarket"),"rmd/printdefault.Rmd",sep="/")))
+      errdf=errorfun(df[,y_string],df[,i])
+      x=errdf;out=c(out,knit_child(paste(system.file(package="trendsmarket"),"rmd/printdf.Rmd",sep="/")))
+      out = c(out, knit_child(paste(system.file(package="trendsmarket"),"rmd/loopggplot.Rmd",sep="/")))
+    }
+ },error=function(x){print(x)})
+  
+}
+
+```
+`r paste(out, collapse='\n')`

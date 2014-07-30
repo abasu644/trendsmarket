@@ -1,0 +1,40 @@
+
+
+```{r warning=FALSE,error=TRUE,echo=F,comment=NA,fig.width = 12 , fig.height = 10,width=120,tidy = FALSE, size="small"}
+ 
+ cid=as.numeric(unlist(strsplit(cid,",")))
+ print(paste("cid list=",paste(cid,collapse=",")))
+ dt=read.csv(cid_file,sep="\t")
+ colnames(dt)=c("cid","dte","count","netrev","clicks")
+ dt$cid=as.numeric(as.character(dt$cid))
+ cd=dt[dt$cid %in% cid,]
+ cd[,c("count","netrev","clicks")]=apply(cd[,c("count","netrev","clicks")],2,function(x){as.numeric(as.character(x))})
+ 
+ 
+ cd= ddply(cd, c("cid","dte"), summarise,count = sum(count), netrev=sum(netrev),clicks = sum(clicks))
+ tsd=zoo(cd$count,order.by=cd$dte)
+  ml=melt(cd, id = "dte")
+ ml$value=round(as.numeric(as.character(ml$value)),2)
+```
+<br/>
+<p><b><u>Netrev - CID</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+ 
+  mln=ml[ml$variable=="netrev",]
+  pl<-ggplot()+geom_line(data=mln,aes(dte, value,group=variable,colour=variable)) +theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  print(pl)
+```
+<br/>
+<p><b><u>Clicks - CID</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+  mlc=ml[ml$variable=="clicks",]
+  pl<-ggplot()+geom_line(data=mlc,aes(dte, value,group=variable,colour=variable)) +theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  print(pl)
+```
+<br/>
+<p><b><u>Count - CID</u></b></p>
+```{r warning=FALSE,error=T,echo=F,comment=NA,tidy = F}
+  mlt=ml[ml$variable=="count",]
+  pl<-ggplot()+geom_line(data=mlt,aes(dte, value,group=variable,colour=variable)) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  print(pl)
+```

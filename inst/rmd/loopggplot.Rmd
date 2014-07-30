@@ -1,0 +1,6 @@
+
+
+```{r warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = FALSE, size="small"}
+pl<-ggplot()+geom_line(data=df, aes_string(x = y_string, y = cnm)  ) 
+print(pl)
+```

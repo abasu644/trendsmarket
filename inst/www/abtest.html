@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Market Id Data Points</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<!-- ocpu library -->
+<script src="opencpu/jquery-1.10.2.min.js"> </script>
+<script src="opencpu/opencpu-0.4.js"> </script>
+
+<!-- some optional styling stuff -->
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="jqueryui/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" media="screen">
+
+<script src="bootstrap/js/bootstrap.js"> </script>
+<script src="jqueryui/jquery-ui-1.10.3.custom.js"> </script>
+
+<script>
+$(document).ready(function() {
+
+   function abtest(){
+	  var rf_code =$("#rf_code").val();
+	  $("#abtestbutton").attr("disabled", "disabled");
+       var req = ocpu.call("viewabtest", {
+	         "rf_code" : rf_code
+	     }, function(session){
+	         session.getFile("viewabtest_temp.html",function(outtxt){
+	             $("#abtestdiv").html(outtxt);
+	         });
+	     });
+	     req.fail(function(){
+	         alert("Server error: " + req.responseText);
+	     });
+	     req.always(function(){
+	         $("#abtestbutton").removeAttr("disabled")
+      	 });
+
+    }
+  $("#abtestdiv").resizable()
+
+  //button handler
+  $("#abtestbutton").on("click", function(e){
+    e.preventDefault();
+    abtest();
+  });
+  abtest();
+});
+</script>
+<style>
+
+#stations {
+  height: 285px;
+}
+
+#plotdiv {
+  width: 100%;
+  height: 600px;
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+}
+
+#plotbutton{
+  width: 150px;
+  margin-left: 50px;
+}
+table {
+white-space: nowrap;
+}
+</style>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="page-header">
+      <h1>A/B Test Results</h1>
+    </div>
+    <div class="row">
+	      <div >
+	        <form class="well" id="paramform">
+	            <select id="rf_code">
+			      <option value="gfx">gfx</option>
+			    </select>
+			    <button class="btn btn-primary" id="abtestbutton"><i class="icon-ok icon-white"></i> Show A/B Test Results</button>
+	        </form>
+	      </div>
+
+    </div>
+    <div class="row">
+	    <div >
+		        <div id="abtestdiv"></div>
+	      </div>
+      </div>
+   </div>
+</body>
+</html>

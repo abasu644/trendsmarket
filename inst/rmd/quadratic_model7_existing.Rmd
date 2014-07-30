@@ -1,0 +1,65 @@
+
+```{r  warning=FALSE,error=TRUE,echo=F,message=FALSE,comment=NA}
+plotFandVandPred <- function(traffic.df)
+{
+  traffic.df=traffic.df[order(traffic.df$DTE),]
+  ml=melt(traffic.df, id = "DTE")
+  mlf1=ml[ml$variable %in% c("REVENUE","COST","NETREV","TRNETREV","PRED_NETREV"),]
+  mlf2=ml[ml$variable %in% c("CLICKS","IMPR"),]
+  mlf1$set="Finance"
+  mlf2$set="Volume"
+  mlf=rbind(mlf1,mlf2)
+  pl<-ggplot()+geom_line(data=subset(mlf,set=="Volume"),aes(DTE, value,group=variable,colour=variable))+
+  geom_line(data=subset(mlf,set=="Finance"),aes(DTE, value,group=variable,colour=variable))+facet_grid(set ~ .     ,scales="free_y")
+  print(pl)
+}
+
+if(!is.na(latestmaxcpc))
+ {
+   comment=""
+  if(is.na(netrev_pred))
+  {
+    comment="\nNo Quadratic Model Prepared"
+  }
+ print(paste ("Latest Netrevenue =",actual_netrev,
+              "\nLatest max_cpc =",latestmaxcpc,
+              "\nPredicted Netrev based on latest max_cpc=",netrev_pred,
+              comment
+              )
+       )
+ }
+mktdatafile="data_analysis_mktid_rule_1-5_gfx.tsv"
+ mktdata=system(paste("grep ",  mktid, paste(" ",base_path,mktdatafile,sep=""),sep=""),intern=T,ignore.stderr=T)
+ dndf=as.data.frame( t(sapply(1:length(mktdata), function(x) strsplit(mktdata, "\t")[[x]])) ) 
+cnm=system(paste("head -1 ",  paste(" ",base_path,mktdatafile,sep=""),sep=""),intern=T,ignore.stderr=T)
+ cnm=unlist(strsplit(cnm, "\t"))
+ colnames(dndf)=cnm
+dndf=dndf[,-length(dndf)]
+dndf=dndf[,!(colnames(dndf) %in% c("rpc_clust"))]
+ dndf$dte=as.Date(as.character(dndf$dte))
+dndf=dndf[order(dndf$dte),]
+ dndf=dndf[dndf$dte!='2014-05-27',]
+ dndf[,!(colnames(dndf) %in% c("dte"))]=apply(dndf[,!(colnames(dndf) %in% c("dte"))],2,as.numeric)
+
+
+ run.date = as.Date("3015-06-02")
+ cnm=colnames(read.csv(paste(base_path,"data.csv",sep=""),sep="\t"))
+ a=system(paste("grep ",  mktid, paste(" ",base_path,"run_data.tsv",sep=""),sep=""),intern=T,ignore.stderr=T)
+ alltraffic.df=as.data.frame( t(sapply(1:length(a), function(x) strsplit(a, "\t")[[x]])) ) 
+ colnames(alltraffic.df)=cnm
+ alltraffic.df$DTE=as.Date(as.character(alltraffic.df$DTE))
+ alltraffic.df=alltraffic.df[alltraffic.df$DTE!='2014-05-27',]
+ alltraffic.df[,!(colnames(alltraffic.df) %in% c("DTE","RF_CODE"))]=apply(alltraffic.df[,!(colnames(alltraffic.df) %in% c("DTE","RF_CODE"))],2,as.numeric)
+ audits.csv = paste("_", run.date,".csv", sep="")
+ mkt.id = mktid
+ rf_code ="gfx"
+ 
+print("Time Series of market Id")
+
+traffic_pred=merge(alltraffic.df,dndf[,c("dte","sq_coeff","lin_coeff","intercept")],by.y="dte",by.x="DTE")
+traffic_pred$PRED_NETREV=(traffic_pred$MAX_CPC*traffic_pred$MAX_CPC)*traffic_pred$sq_coeff + 
+  traffic_pred$MAX_CPC*traffic_pred$lin_coeff + traffic_pred$intercept
+print(traffic_pred)
+plotFandVandPred(traffic_pred)
+quadratic.fn(mkt.id, rf_code, run.date,alltraffic.df)
+```

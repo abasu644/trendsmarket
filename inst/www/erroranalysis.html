@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Uploading your Error File-Columns should be actual,pred_1,pred_2,...</title>
+
+    <!-- Include order: first jquery, then opencpu.js, and then your code -->
+    <script src="opencpu/jquery-1.10.2.min.js"></script>
+    <script src="opencpu/opencpu-0.4.js"></script>
+<!-- some optional styling stuff -->
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="jqueryui/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" media="screen">
+
+<script src="bootstrap/js/bootstrap.js"> </script>
+<script src="jqueryui/jquery-ui-1.10.3.custom.js"> </script>
+
+
+    <script>
+    //init this script when the page has loaded
+
+
+    $(document).ready(function(){
+
+      var req = ocpu.call("listerrors", {
+	  	  										          "searchtext": "gfx"
+	  	  										        }, function(session)
+	  	  										        	{
+	  	  										         			session.getFile("listerrors_temp.html",function(outtxt)
+	  	  										         			{
+
+	  	  												 	             $("#errorlist").html(outtxt);
+	  	  											         		});
+	  	  									    	});
+	        //if R returns an error, alert the error message
+	  	          req.fail(function(){
+	  	            alert("Server error: " + req.responseText);
+	  	          });
+
+	  	          //after request complete, re-enable the button
+	  	          req.always(function(){
+	  	            $("#submitbutton").removeAttr("disabled")
+        });
+      $("#submitbutton").on("click", function(){
+
+        //arguments
+        var myheader = $("#header").val() ;
+        var myfile = $("#csvfile")[0].files[0];
+		var mysep = $("#sep").val() ;
+		var description=$("#description").val();
+		var rf_code=$("#rf_code").val();
+       if(!myfile){
+          alert("No file selected.");
+          return;
+        }
+
+        //disable the button during upload
+        $("#submitbutton").attr("disabled", "disabled");
+
+        //perform the request
+        var req = ocpu.call("calculateerror", {
+								          filenm : myfile,
+								          headero : myheader,
+								          sepo : mysep,
+								          rf_code : rf_code,
+								          description : description
+								        }, function(session)
+								        	{
+								         			session.getFile("calculateerror_temp.html",function(outtxt)
+								         			{
+										 	             $("#errordetails").html(outtxt);
+									         		});
+									    	});
+
+        //if R returns an error, alert the error message
+        req.fail(function(){
+          alert("Server error: " + req.responseText);
+        });
+
+        //after request complete, re-enable the button
+        req.always(function(){
+          $("#submitbutton").removeAttr("disabled")
+        });
+
+      });
+
+       $("#searchbutton").on("click", function(){
+
+	           //arguments
+	           var searchtext = $("#searchtext").val() ;
+	          //disable the button during search
+	           $("#searchbutton").attr("disabled", "disabled");
+
+	           //perform the request
+	           var req = ocpu.call("listerrors", {
+			   	  	  										          "searchtext": searchtext
+			   	  	  										        }, function(session)
+			   	  	  										        	{
+			   	  	  										         			session.getFile("listerrors_temp.html",function(outtxt)
+			   	  	  										         			{
+
+			   	  	  												 	             $("#errorlist").html(outtxt);
+			   	  	  											         		});
+			   	  	  									    	});
+			   	        //if R returns an error, alert the error message
+			   	  	          req.fail(function(){
+			   	  	            alert("Server error: " + req.responseText);
+			   	  	          });
+
+			   	  	          //after request complete, re-enable the button
+			   	  	          req.always(function(){
+			   	  	            $("#searchbutton").removeAttr("disabled")
+     						   });
+
+	         });
+
+    });
+    </script>
+
+    <style>
+table {
+white-space: nowrap;
+}
+
+    </style>
+
+  </head>
+
+
+  <body>
+      <div class="container">
+
+	    <div class="page-header">
+	      <h1>Evaluate Model Error -Upload/Search</h1>
+	    </div>
+	     <div class="row">
+		      <div >
+		       <form class="well" id="paramform">
+
+		            <input type="text" name="searchtext" id="searchtext" value=""></input>
+		            <button class="btn btn-primary" id="searchbutton"><i class="icon-ok icon-white"></i> Search Evaluated Error </button>
+		            </form>
+		      </div>
+
+    	</div>
+	    <div class="row">
+	    <div >
+        <p>
+		     This page will calculate rmse and other statistical error metric to analyze  error in a model.The file columns should be in the order of actual,pred_1,pred_2,etc.
+			 At least 2 columns of data must be present(i.e actual,pred_1 ) and a max of 4 .You can define your own header.
+		</p>
+		 <p>
+			You can also Search for   error metrics which were evaluated earlier.
+		</p>
+		</div>
+		</div>
+
+        <div class="row">
+          <div >
+           <form class="well" id="paramform2">
+
+            <b>File</b> <input type="file" id="csvfile"/>
+			    <br />
+
+			    <b>Header</b> <select id="header">
+			      <option value="1">true</option>
+			      <option value="0">false</option>
+			    </select>
+			    <br/>
+				<b>Delimiter</b> <select id="sep">
+
+							      <option value=",">comma</option>
+							       <option value="\t">tab</option>
+			    </select>
+			    <br />
+			    <b>RF_CODE</b> <select id="rf_code">
+										      <option value="gfx">gfx</option>
+							    </select>
+			    <br />
+			    <b>Description</b>
+			    <textarea rows="3" cols="30" id="description" > </textarea>
+			    <br/>
+		        <button id="submitbutton"  class="btn btn-primary"  type="button">Upload file!</button>
+   		     </form>
+          </div>
+        </div>
+        <div class="row">
+					<div class="span8">
+								<div id="errorlist"></div>
+					</div>
+	    </div>
+        <div class="row">
+			<div class="span8">
+						<div id="errordetails"></div>
+			</div>
+	    </div>
+	    <div class="row">
+			<div class="span8">
+							<p>
+							  <b>Note that HTML5 is required to upload files!</b> <br />
+							  This means that this won't work in internet explorer version 9 or lower.
+							  You need Firefox, Chrome, Safari or Internet Explorer 10+
+						 </p>
+			  </div>
+	      </div>
+    </div>
+    <!-- Piwik -->
+	<script type="text/javascript">
+	  var _paq = _paq || [];
+	  _paq.push(['trackPageView']);
+	  _paq.push(['enableLinkTracking']);
+	  (function() {
+	    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://abasu644.piwikpro.com/";
+	    _paq.push(['setTrackerUrl', u+'piwik.php']);
+	    _paq.push(['setSiteId', 1]);
+	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+	    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+	  })();
+	</script>
+	<noscript><p><img src="http://abasu644.piwikpro.com/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+  </body>
+</html>
