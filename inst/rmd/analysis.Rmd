@@ -1,0 +1,43 @@
+---
+title: "Untitled"
+author: "szindia"
+date: "Wednesday, July 30, 2014"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r tidy=FALSE,warning=FALSE,comment=NA}
+
+data<-read.csv("/home/devtest/mktidlist.txt",sep="\t")
+nrow(data)
+data$margin<-data$revenue-data$cost
+#data preview:
+head(data)
+str(data)
+#operations
+margin_summary<-tapply(data$margin,data$dte,sum)
+margin_summary<-as.data.frame(margin_summary)
+colnames(margin_summary)<-c("margin")
+rev_summary<-tapply(data$revenue,data$dte,sum)
+rev_summary<-as.data.frame(rev_summary)
+cost_summary<-tapply(data$cost,data$dte,sum)
+cost_summary<-as.data.frame(cost_summary)
+click_summary<-tapply(data$clicks,data$dte,sum)
+click_summary<-as.data.frame(click_summary)
+impr_summary<-tapply(data$impr,data$dte,sum)
+impr_summary<-as.data.frame(impr_summary)
+redir_summary<-tapply(data$redirects,data$dte,sum)
+redir_summary<-as.data.frame(redir_summary)
+#plots
+plot(unique(data$dte),margin_summary$margin,xlab = "date",ylab ="Net Profit",main="Profit per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
+plot(unique(data$dte),rev_summary$rev_summary,xlab = "date",ylab ="Net Revenue",main="Revenue per Date analysis",col="blue");grid(col="goldenrod4")
+plot(unique(data$dte),cost_summary$cost_summary,xlab = "date",ylab ="Net Cost",main="Cost per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
+plot(unique(data$dte),click_summary$click_summary,xlab = "date",ylab ="Net Clicks",main="Click per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
+plot(unique(data$dte),impr_summary$impr_summary,xlab = "date",ylab ="Net Impressions",main="Impression per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
+plot(unique(data$dte),redir_summary$redir_summary,xlab = "date",ylab ="Net Redirects",main="Redirects per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
+summary(data)
+
+```
