@@ -2,7 +2,10 @@
 rmdflag=1
 rmdstr=""
 finalfile="default.html"
+<<<<<<< HEAD
 #base_path="C:/Users/abasu/Desktop/rpackages/"
+=======
+>>>>>>> e11fc50c5b93208c146d53d2352408a735621eb0
 base_path="/home/devtest/"
 
   
