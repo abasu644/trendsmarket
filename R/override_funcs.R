@@ -2,8 +2,8 @@
 rmdflag=1
 rmdstr=""
 finalfile="default.html"
-base_path="C:/Users/abasu/Desktop/rpackages/"
-#base_path="/home/devtest/"
+#base_path="C:/Users/abasu/Desktop/rpackages/"
+base_path="/home/devtest/"
 
   
 print.data.frame.orig <- getS3method("print", "data.frame")
