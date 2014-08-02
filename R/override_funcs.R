@@ -2,13 +2,10 @@
 rmdflag=1
 rmdstr=""
 finalfile="default.html"
-<<<<<<< HEAD
 #base_path="C:/Users/abasu/Desktop/rpackages/"
-=======
->>>>>>> e11fc50c5b93208c146d53d2352408a735621eb0
 base_path="/home/devtest/"
 
-  
+
 print.data.frame.orig <- getS3method("print", "data.frame")
 print.default.orig <- getS3method("print", "default")
 print.ggplot.orig <- getS3method("print", "ggplot")
@@ -75,10 +72,10 @@ print.default.knit<- function(x)
 {
   cat(x)
   cat("\n")
- # knit2html(paste(system.file(package="trendsmarket"),"rmd/printdefault.Rmd",sep="/"),fragment.only = TRUE)
-#   s1 <- paste(readLines("printdefault.html"), collapse="\n")
-#   #rmdstr<-paste(readLines(finalfile), collapse="\n")
-#   rmdstr<-paste(rmdstr,s1)
+  # knit2html(paste(system.file(package="trendsmarket"),"rmd/printdefault.Rmd",sep="/"),fragment.only = TRUE)
+  #   s1 <- paste(readLines("printdefault.html"), collapse="\n")
+  #   #rmdstr<-paste(readLines(finalfile), collapse="\n")
+  #   rmdstr<-paste(rmdstr,s1)
   #ff <- file(finalfile,open="at")
   #write(rmdstr,file=ff)
   #close(ff)
@@ -87,9 +84,9 @@ print.ggplot.knit<- function(x)
 {
   print.ggplot.orig(x)
   #knit2html(paste(system.file(package="trendsmarket"),"rmd/ggplot.Rmd",sep="/"),fragment.only = TRUE)
-#   s1 <- paste(readLines("ggplot.html"), collapse="\n")
-#   #rmdstr<-paste(readLines(finalfile), collapse="\n")
-#   rmdstr<-paste(rmdstr,s1)
+  #   s1 <- paste(readLines("ggplot.html"), collapse="\n")
+  #   #rmdstr<-paste(readLines(finalfile), collapse="\n")
+  #   rmdstr<-paste(rmdstr,s1)
   #ff <- file(finalfile,open="at")
   #write(rmdstr,file=ff)
   #sclose(ff)
@@ -97,7 +94,7 @@ print.ggplot.knit<- function(x)
 #
 getmetadata<-function()
 {
-   meta_file="dataset_metadata.conf"
+  meta_file="dataset_metadata.conf"
   flp=paste(base_path,meta_file,sep="")
   read.csv(flp)
   
