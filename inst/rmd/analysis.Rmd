@@ -5,11 +5,11 @@ title: "Grouped cid Analysis"
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
 #input data
 #UI
-#base_path="/home/devtest/"
+base_path="/home/devtest/"
 #local
 library(ggplot2)
 library(reshape2)
-base_path="D:/"
+#base_path="D:/"
 pt<-paste(base_path,"sg_2.txt",sep="")
 sg<-read.csv(pt,sep="\t")
 nrow(sg)
