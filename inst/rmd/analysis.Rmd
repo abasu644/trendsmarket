@@ -1,43 +1,60 @@
 ---
-title: "Untitled"
-author: "szindia"
-date: "Wednesday, July 30, 2014"
+title: "Cid Cluster Analysis"
+date: "Monday, August 04, 2014"
 output: html_document
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r tidy=FALSE,warning=FALSE,comment=NA}
-
-data<-read.csv("/home/devtest/mktidlist.txt",sep="\t")
-nrow(data)
-data$margin<-data$revenue-data$cost
-#data preview:
-head(data)
-str(data)
-#operations
-margin_summary<-tapply(data$margin,data$dte,sum)
-margin_summary<-as.data.frame(margin_summary)
-colnames(margin_summary)<-c("margin")
-rev_summary<-tapply(data$revenue,data$dte,sum)
-rev_summary<-as.data.frame(rev_summary)
-cost_summary<-tapply(data$cost,data$dte,sum)
-cost_summary<-as.data.frame(cost_summary)
-click_summary<-tapply(data$clicks,data$dte,sum)
-click_summary<-as.data.frame(click_summary)
-impr_summary<-tapply(data$impr,data$dte,sum)
-impr_summary<-as.data.frame(impr_summary)
-redir_summary<-tapply(data$redirects,data$dte,sum)
-redir_summary<-as.data.frame(redir_summary)
-#plots
-plot(unique(data$dte),margin_summary$margin,xlab = "date",ylab ="Net Profit",main="Profit per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
-plot(unique(data$dte),rev_summary$rev_summary,xlab = "date",ylab ="Net Revenue",main="Revenue per Date analysis",col="blue");grid(col="goldenrod4")
-plot(unique(data$dte),cost_summary$cost_summary,xlab = "date",ylab ="Net Cost",main="Cost per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
-plot(unique(data$dte),click_summary$click_summary,xlab = "date",ylab ="Net Clicks",main="Click per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
-plot(unique(data$dte),impr_summary$impr_summary,xlab = "date",ylab ="Net Impressions",main="Impression per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
-plot(unique(data$dte),redir_summary$redir_summary,xlab = "date",ylab ="Net Redirects",main="Redirects per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
-summary(data)
-
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+#input data
+#UI
+#base_path="/home/devtest/"
+#local
+base_path="D:/"
+pt<-paste(base_path,"sg_2.txt",sep="")
+sg<-read.csv(pt,sep="\t")
+nrow(sg)
 ```
+
+<p><b><u> Head of data</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=head(sg)
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+#operations
+#Date level plots
+plot.ts(unique(sg$dte),by(sg$t_rev,sg$dte,sum),xlab="Date",ylab="Sum of Revenue",xy.labels =as.character(by(sg$t_rev,sg$dte,sum)),col="darkslateblue");grid(col="grey")
+plot.ts(unique(sg$dte),by(sg$t_cost,sg$dte,sum),xlab="Date",ylab="Sum of Cost",xy.labels =as.character(by(sg$t_cost,sg$dte,sum)),col="darkorchid3");grid(col="grey")
+plot.ts(unique(sg$dte),by(sg$t_clicks,sg$dte,sum),xlab="Date",ylab="Sum of Clicks",xy.labels =as.character(by(sg$t_clicks,sg$dte,sum)),col="goldenrod4");grid(col="grey")
+plot.ts(unique(sg$dte),by(sg$t_impr,sg$dte,sum),xlab="Date",ylab="Sum of Impressions",xy.labels =as.character(by(sg$t_impr,sg$dte,sum)),col="green");grid(col="grey")
+plot.ts(unique(sg$dte),by(sg$t_red,sg$dte,sum),xlab="Date",ylab="Sum of Redirects",xy.labels =as.character(by(sg$t_red,sg$dte,sum)),col="lightcoral");grid(col="grey")
+#Group level plots
+barplot(by(sg$t_rev,sg$cid_mod_group,sum),col="lightskyblue1",legend.text = "Sum of Revenue",main = "Sum of Revenue analysis per group ",xlab="Group")
+barplot(by(sg$t_cost,sg$cid_mod_group,sum),col="red",legend.text = "Sum of Cost",main = "Sum of Cost analysis per group ",xlab="Group")
+barplot(by(sg$t_impr,sg$cid_mod_group,sum),col="orchid",legend.text = "Sum of Impressions",main = "Sum of Impressions analysis per group ",xlab="Group")
+barplot(by(sg$t_clicks,sg$cid_mod_group,sum),col="sienna",legend.text = "Sum of Clicks",main = "Sum of Clicks analysis per group ",xlab="Group")
+barplot(by(sg$t_red,sg$cid_mod_group,sum),col="yellow",legend.text = "Sum of Redirects",main = "Sum of Redirects analysis per group ",xlab="Group")
+```
+<p><b><u> Summary of data</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=summary(sg)
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+
