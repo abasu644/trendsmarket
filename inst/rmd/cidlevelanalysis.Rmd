@@ -1,0 +1,114 @@
+---
+title: "cid level Analysis"
+date: "Friday, August 1, 2014"
+output: html_document
+---
+
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+library(calibrate)
+library(rgl)
+base_path="/home/devtest/"
+pt<-paste(base_path,"mktlist.txt",sep="")
+data<-read.csv(pt,sep="\t")
+nrow(data)
+data$margin<-data$revenue-data$cost
+#data preview:
+```
+
+<p><b><u> Head of data</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=head(data[-c(1,20,22)])
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
+
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+#operations
+margin_summary<-tapply(data$margin,data$dte,sum)
+margin_summary<-as.data.frame(margin_summary)
+colnames(margin_summary)<-c("margin")
+rev_summary<-tapply(data$revenue,data$dte,sum)
+rev_summary<-as.data.frame(rev_summary)
+cost_summary<-tapply(data$cost,data$dte,sum)
+cost_summary<-as.data.frame(cost_summary)
+click_summary<-tapply(data$clicks,data$dte,sum)
+click_summary<-as.data.frame(click_summary)
+impr_summary<-tapply(data$impr,data$dte,sum)
+impr_summary<-as.data.frame(impr_summary)
+redir_summary<-tapply(data$redirects,data$dte,sum)
+redir_summary<-as.data.frame(redir_summary)
+#plots
+plot(unique(data$dte),margin_summary$margin,xlab = "date",ylab ="Net Profit",main="Profit per Date analysis",col="blue",cex.axis=0.5);grid(col="goldenrod4")
+plot(unique(data$dte),rev_summary$rev_summary,xlab = "date",ylab ="Net Revenue",main="Revenue per Date analysis",col="blue",cex.axis=0.5);grid(col="goldenrod4")
+plot(unique(data$dte),cost_summary$cost_summary,xlab = "date",ylab ="Net Cost",main="Cost per Date analysis",col="blue",cex.axis=0.5);grid(col="goldenrod4")
+plot(unique(data$dte),click_summary$click_summary,xlab = "date",ylab ="Net Clicks",main="Click per Date analysis",col="blue",cex.axis=0.5);grid(col="goldenrod4")
+plot(unique(data$dte),impr_summary$impr_summary,xlab = "date",ylab ="Net Impressions",main="Impression per Date analysis",col="blue",cex.axis=0.5);grid(col="goldenrod4")
+plot(unique(data$dte),redir_summary$redir_summary,xlab = "date",ylab ="Net Redirects",main="Redirects per Date analysis",col="blue",cex.axis=0.5);grid(col="goldenrod4")
+#
+news<-tapply(data$margin,data$mkt_id,sum)
+news<-as.data.frame(news)
+profit_making_id<-news[news$news >0,]
+profit_making_id<-as.data.frame(profit_making_id)
+nrow(profit_making_id)
+
+#cid level analysis
+margin_summary1<-tapply(data$margin,data$cid,sum)
+margin_summary1<-as.data.frame(margin_summary1)
+maxcpc_summary<-tapply(data$max_cpc,data$cid,mean)
+maxcpc_summary<-as.data.frame(maxcpc_summary)
+impr_summary1<-tapply(data$impr,data$cid,mean)
+impr_summary1<-as.data.frame(impr_summary1)
+margin_summary2<-tapply(data$margin,data$cid,mean)
+margin_summary2<-as.data.frame(margin_summary2)
+red_summary<-tapply(data$redirects,data$cid,sum)
+red_summary<-as.data.frame(red_summary)
+cost_summary1<-tapply(data$cost,data$cid,sum)
+cost_summary1<-as.data.frame(cost_summary1)
+rev_summary1<-tapply(data$revenue,data$cid,sum)
+rev_summary1<-as.data.frame(rev_summary1)
+
+#plots(2D and 3D)
+plot(maxcpc_summary$maxcpc_summary,margin_summary1$margin_summary1,xlab = "max_cpc",ylab ="Sum of margin",main="sum of Margin vs max_cpc per cid analysis",cex.axis =  0.5);grid(col="goldenrod4")
+textxy(maxcpc_summary$maxcpc_summary,margin_summary1$margin_summary1,unique(data$cid),col="red")
+plot3d(maxcpc_summary$maxcpc_summary,margin_summary1$margin_summary1,unique(data$cid), col="red",xlab = "max_cpc",ylab = "Sum of margin",zlab = "cid" ,size=3)
+
+plot(maxcpc_summary$maxcpc_summary,margin_summary2$margin_summary2,xlab = "max_cpc",ylab ="Mean margin",main="Mean Margin vs max_cpc per cid analysis",cex.axis =  0.5);grid(col="goldenrod4")
+textxy(maxcpc_summary$maxcpc_summary,margin_summary2$margin_summary2,unique(data$cid),col="red")
+plot3d(maxcpc_summary$maxcpc_summary,margin_summary2$margin_summary2,unique(data$cid), col="red",xlab = "max_cpc",ylab = "Mean margin",zlab = "cid" ,size=3)
+
+plot(maxcpc_summary$maxcpc_summary,impr_summary1$impr_summary1,xlab = "max_cpc",ylab ="Sum of impressions",main="Sum of Impressions vs max_cpc per cid analysis",cex.axis =  0.5);grid(col="goldenrod4")
+textxy(maxcpc_summary$maxcpc_summary,impr_summary1$impr_summary1,unique(data$cid),col="red")
+plot3d(maxcpc_summary$maxcpc_summary,impr_summary1$impr_summary1,unique(data$cid), col="red",xlab = "max_cpc",ylab = "Sum of impressions",zlab = "cid" ,size=3)
+
+plot(maxcpc_summary$maxcpc_summary,cost_summary1$cost_summary1,xlab = "max_cpc",ylab ="Sum of cost incurred",main="Sum of Cost vs max_cpc per cid analysis",cex.axis =  0.5);grid(col="goldenrod4")
+textxy(maxcpc_summary$maxcpc_summary,cost_summary1$cost_summary1,unique(data$cid),col="red")
+plot3d(maxcpc_summary$maxcpc_summary,cost_summary1$cost_summary1,unique(data$cid), col="red",xlab = "max_cpc",ylab = "Sum of cost incurred",zlab = "cid" ,size=3)
+
+plot(maxcpc_summary$maxcpc_summary,rev_summary1$rev_summary1,xlab = "max_cpc",ylab ="Sum of Revenue",main="Sum of Revenue vs max_cpc per cid analysis",cex.axis =  0.5);grid(col="goldenrod4")
+textxy(maxcpc_summary$maxcpc_summary,rev_summary1$rev_summary1,unique(data$cid),col="red")
+plot3d(maxcpc_summary$maxcpc_summary,rev_summary1$rev_summary1,unique(data$cid), col="red",xlab = "max_cpc",ylab = "Sum of Revenue",zlab = "cid" ,size=3)
+```
+
+
+<p><b><u> Summary of  data</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=summary(data[-c(1,20,22)])
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
