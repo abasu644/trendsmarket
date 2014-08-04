@@ -1,34 +1,79 @@
 
-```{r warning=FALSE,error=T,echo=F,comment=NA}
-print(base_path)
-data<-read.csv(paste(base_path,"mktidlist.txt",sep=""),sep="\t")
-print(head(data))
-nrow(data)
-data$margin<-data$revenue-data$cost
-#data preview:
-head(data)
-str(data)
-#operations
-margin_summary<-tapply(data$margin,data$dte,sum)
-margin_summary<-as.data.frame(margin_summary)
-colnames(margin_summary)<-c("margin")
-rev_summary<-tapply(data$revenue,data$dte,sum)
-rev_summary<-as.data.frame(rev_summary)
-cost_summary<-tapply(data$cost,data$dte,sum)
-cost_summary<-as.data.frame(cost_summary)
-click_summary<-tapply(data$clicks,data$dte,sum)
-click_summary<-as.data.frame(click_summary)
-impr_summary<-tapply(data$impr,data$dte,sum)
-impr_summary<-as.data.frame(impr_summary)
-redir_summary<-tapply(data$redirects,data$dte,sum)
-redir_summary<-as.data.frame(redir_summary)
-#plots
-plot(unique(data$dte),margin_summary$margin,xlab = "date",ylab ="Net Profit",main="Profit per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
-plot(unique(data$dte),rev_summary$rev_summary,xlab = "date",ylab ="Net Revenue",main="Revenue per Date analysis",col="blue");grid(col="goldenrod4")
-plot(unique(data$dte),cost_summary$cost_summary,xlab = "date",ylab ="Net Cost",main="Cost per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
-plot(unique(data$dte),click_summary$click_summary,xlab = "date",ylab ="Net Clicks",main="Click per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
-plot(unique(data$dte),impr_summary$impr_summary,xlab = "date",ylab ="Net Impressions",main="Impression per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
-plot(unique(data$dte),redir_summary$redir_summary,xlab = "date",ylab ="Net Redirects",main="Redirects per Date analysis",cex.axis =  0.5);grid(col="goldenrod4")
-summary(data)
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+library(ggplot2)
+library(reshape2)
+sg<-read.csv(paste(base_path,"abtest_group_dtcid.txt",sep=""),sep="\t")
+```
 
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+#operations
+#new columns
+sg$t_nr<-sg$t_rev-sg$t_cost
+sgm=melt(sg,id=c("dte","cid_mod_group"))
+sgm$dte=as.Date(as.character(sgm$dte))
+sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
+sgm$value=round(as.numeric(as.character(sgm$value)),2)
+sgm_c=sgm[sgm$variable=='t_clicks',]
+p<-ggplot()
+p + geom_line(data=sgm_c,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Clicks")+ggtitle("Sum of Clicks per date for each cid group analysis")
+```
+<br/>
+
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
+sgm$value=round(as.numeric(as.character(sgm$value)),2)
+sgm_c1=sgm[sgm$variable=='t_nr',]
+p<-ggplot()
+p + geom_line(data=sgm_c1,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Net_Revenue")+ggtitle("Sum of Net Revenue per date for each cid group analysis")
+```
+<br/>
+
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
+sgm$value=round(as.numeric(as.character(sgm$value)),2)
+sgm_c2=sgm[sgm$variable=='t_rev',]
+p<-ggplot()
+p + geom_line(data=sgm_c2,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Revenue")+ggtitle("Sum of Revenue per date for each cid group analysis")
+```
+<br/>
+
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
+sgm$value=round(as.numeric(as.character(sgm$value)),2)
+sgm_c3=sgm[sgm$variable=='t_cost',]
+p<-ggplot()
+p + geom_line(data=sgm_c3,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Cost")+ggtitle("Sum of Cost per date for each cid group analysis")
+```
+<br/>
+
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
+sgm$value=round(as.numeric(as.character(sgm$value)),2)
+sgm_c4=sgm[sgm$variable=='t_impr',]
+p<-ggplot()
+p + geom_line(data=sgm_c4,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Imressions")+ggtitle("Sum of Impressions per date for each cid group analysis")
+```
+<br/>
+
+
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
+sgm$value=round(as.numeric(as.character(sgm$value)),2)
+sgm_c5=sgm[sgm$variable=='t_red',]
+p<-ggplot()
+p + geom_line(data=sgm_c5,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Redirects")+ggtitle("Sum of Redirects per date for each cid group analysis")
+```
+<br/>
+<p><b><u> All mkt_id data</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=sg
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
 ```
