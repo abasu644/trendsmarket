@@ -6,14 +6,16 @@ title: "Grouped cid Analysis"
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
 #input data
 #UI
-base_path="/home/devtest/"
 #local
 library(ggplot2)
 library(reshape2)
-#base_path="D:/"
-pt<-paste(base_path,"sg_2.txt",sep="")
+base_path="/home/devtest/"
+pt<-paste(base_path,"gfx_abtest_group_dtcid.txt",sep="")
 sg<-read.csv(pt,sep="\t")
 nrow(sg)
+pt2<-paste(base_path,"gfx_abtest_group_dt.txt",sep="")
+q1<-read.csv(pt2,sep="\t")
+nrow(q1)
 ```
 
 <p><b><u> Head of data</u></b></p>
@@ -90,3 +92,52 @@ p + geom_line(data=sgm_c5,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_gr
 ```
 <br/>
 
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+#input data
+#UI
+base_path="/home/devtest/"
+#local
+```
+
+
+<p><b><u> Head of data</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=head(q1)
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+#operations
+q1$t_mg<-q1$t_rev-q1$t_cost
+q1$rpc<-q1$t_rev/q1$t_clicks
+q1$rpc<-round(q1$rpc,digits = 2)
+plot.ts(unique(q1$dte),q1$t_cost,xlab="Date",ylab="Sum of Cost",xy.labels =as.character(q1$t_cost),col="gray0");grid(col="gray55")
+plot.ts(unique(q1$dte),q1$t_rev,xlab="Date",ylab="Sum of Revenue",xy.labels =as.character(q1$t_rev),col="lightgreen");grid(col="gray55")
+plot.ts(unique(q1$dte),q1$t_mg,xlab="Date",ylab="Sum of Margin",xy.labels =as.character(q1$t_rev),col="mediumpurple1");grid(col="gray55")
+plot.ts(unique(q1$dte),q1$t_impr,xlab="Date",ylab="Sum of Impressions",xy.labels =as.character(q1$t_impr),col="slateblue4");grid(col="gray55")
+plot.ts(unique(q1$dte),q1$t_clicks,xlab="Date",ylab="Sum of Clicks",xy.labels =as.character(q1$t_clicks),col="tan1");grid(col="gray55")
+plot.ts(unique(q1$dte),q1$t_red,xlab="Date",ylab="Sum of Redirects",xy.labels =as.character(q1$t_red),col="mediumvioletred");grid(col="gray55")
+plot.ts(unique(q1$dte),q1$rpc,xlab="Date",ylab="Sum of Revenue per clicks",xy.labels =as.character(q1$rpc),col="plum3");grid(col="gray55")
+
+```
+<p><b><u> Summary of data</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=summary(q1)
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
