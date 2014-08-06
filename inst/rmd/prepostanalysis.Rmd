@@ -1,0 +1,134 @@
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+library(ggplot2)
+library(reshape2)
+#input data
+#for UI use this else comment it
+base_path="/home/devtest/"
+#for local system use this else comment it
+# base_path="D:/Work/aug1stweek/"
+pt<-paste(base_path,"gfx_abtest_prepost_dtcid.txt",sep="")
+ab3<-read.csv(pt,sep="\t")
+```
+
+```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+#operations
+#new columns added
+ab3$t_netrev<-ab3$t_rev-ab3$t_cost
+ab3$cid_mod_group<-ifelse(ab3$cid_mod_group=="0","quadratic",ifelse(ab3$cid_mod_group=="1","quadratic_simulator","quadratic_synthscore"))
+predata<-ab3[ab3$period=='PRE',]
+postdata<-ab3[ab3$period=='POST',]
+tapply(predata$t_clicks,predata$cid_mod_group,sum)
+tapply(postdata$t_clicks,postdata$cid_mod_group,sum)
+barplot(tapply(predata$t_netrev,predata$dte,sum),col=unique(predata$dte),main = "Netrev per date group for predata Analysis")
+barplot(tapply(postdata$t_netrev,postdata$dte,sum),col=unique(postdata$dte),main = "Netrev per date group for postdata Analysis")
+barplot(tapply(predata$t_clicks,predata$dte,sum),col=unique(predata$dte),main = "Clicks per date group for predata Analysis")
+barplot(tapply(postdata$t_clicks,postdata$dte,sum),col=unique(postdata$dte),main = "Clicks per date group for postdata Analysis")
+barplot(tapply(predata$t_impr,predata$dte,sum),col=unique(predata$dte),main = "Impressions per date group for predata Analysis")
+barplot(tapply(postdata$t_impr,postdata$dte,sum),col=unique(postdata$dte),main = "Impressions per date group for postdata Analysis")
+barplot(tapply(predata$t_red,predata$dte,sum),col=unique(predata$dte),main = "Redirects per date group for predata Analysis")
+barplot(tapply(postdata$t_red,postdata$dte,sum),col=unique(postdata$dte),main = "Redirects per date group for postdata Analysis")
+barplot(tapply(predata$t_netrev,predata$cid_mod_group,sum),col=unique(predata$dte),main = "Netrev per cid group for predata Analysis")
+barplot(tapply(postdata$t_netrev,postdata$cid_mod_group,sum),col=unique(postdata$dte),main = "Netrev per cid group for postdata Analysis")
+barplot(tapply(predata$t_clicks,predata$cid_mod_group,sum),main = "Clicks per cid group for predata Analysis",legend.text = "Clicks")
+barplot(tapply(postdata$t_clicks,postdata$cid_mod_group,sum),main = "Clicks per cid group for postdata Analysis",legend.text = "Clicks")
+barplot(tapply(predata$t_impr,predata$cid_mod_group,sum),main = "Impressions per cid group for predata Analysis",legend.text = "Impressions")
+barplot(tapply(postdata$t_impr,postdata$cid_mod_group,sum),main = "Impressions per cid group for postdata Analysis",legend.text = "Impressions")
+barplot(tapply(predata$t_red,predata$cid_mod_group,sum),main = "Redirects per cid group for predata Analysis",legend.text = "Redirects")
+barplot(tapply(postdata$t_red,postdata$cid_mod_group,sum),main = "Redirects per cid group for postdata Analysis",legend.text = "Redirects")
+losspre<-predata[predata$t_netrev<0,]
+losspost<-postdata[postdata$t_netrev<0,]
+losspre<-subset(losspre, !duplicated(losspre[,2]))
+losspost<-subset(losspost, !duplicated(losspost[,2]))
+losspre<-losspre[order(losspre$t_netrev),]
+losspost<-losspost[order(losspost$t_netrev),]
+toppreloss<-losspre[1:20,]
+toppostloss<-losspost[1:20,]
+
+ab3_quad<-ab3[ab3$cid_mod_group=='quadratic',]
+ab3_quad_loss<-ab3_quad[ab3_quad$t_netrev<0,]
+ab3_quad_loss<-subset(ab3_quad_loss, !duplicated(ab3_quad_loss[,2]))
+ab3_quad_loss_od<-ab3_quad_loss[order(ab3_quad_loss$t_netrev),]
+toploss_quad<-ab3_quad_loss_od[1:20,]
+
+ab3_sim<-ab3[ab3$cid_mod_group=='quadratic_simulator',]
+ab3_sim_loss<-ab3_sim[ab3_sim$t_netrev<0,]
+ab3_sim_loss <- subset(ab3_sim_loss, !duplicated(ab3_sim_loss[,2])) 
+ab3_sim_loss_od<-ab3_sim_loss[order(ab3_sim_loss$t_netrev),]
+toploss_sim<-ab3_sim_loss_od[1:20,]
+
+ab3_synth<-ab3[ab3$cid_mod_group=='quadratic_synthscore',]
+ab3_synth_loss<-ab3_synth[ab3_synth$t_netrev<0,]
+ab3_synth_loss <- subset(ab3_synth_loss, !duplicated(ab3_synth_loss[,2])) 
+ab3_synth_loss_od<-ab3_synth_loss[order(ab3_synth_loss$t_netrev),]
+toploss_synth<-ab3_synth_loss_od[1:20,]
+```
+<p><b><u> Loss Making cid for pre A/B Test data</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=toppreloss
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
+<p><b><u> Loss Making cid for post A/B Test data</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=toppostloss
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
+<p><b><u> Loss Making cid for Quadratic Algo</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=toploss_quad
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
+<p><b><u> Loss Making cid for Quadratic_Simulator Algo</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=toploss_sim
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
+<p><b><u> Loss Making cid for Quadratic_Synthscore Algo</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=toploss_synth
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
