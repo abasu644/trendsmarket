@@ -1,8 +1,14 @@
 
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
+#input data
+#UI
+#base_path="/home/devtest/"
+#local
+
 library(ggplot2)
 library(reshape2)
-sg<-read.csv(paste(base_path,"abtest_group_dtcid.txt",sep=""),sep="\t")
+sg<-read.csv(paste(base_path,"gfx_abtest_group_dtcid.txt",sep=""),sep="\t")
+
 ```
 
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
@@ -12,44 +18,77 @@ sg$t_nr<-sg$t_rev-sg$t_cost
 sgm=melt(sg,id=c("dte","cid_mod_group"))
 sgm$dte=as.Date(as.character(sgm$dte))
 sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
+sgm$cid_mod_group<-ifelse(sgm$cid_mod_group=="0","quadractic",ifelse(sgm$cid_mod_group=="1","quadratic_simulator","quadratic_synthscore"))
 sgm$value=round(as.numeric(as.character(sgm$value)),2)
 sgm_c=sgm[sgm$variable=='t_clicks',]
+ab<-aggregate(sgm_c$value,by=list(sgm_c$dte),FUN=sum)
+ab<-as.data.frame(ab)
+colnames(ab)<-c("dte","sum")
+ab$cid_mod_group="abtestall"
+ab$variable="t_clicks"
+colnames(ab)[which(colnames(ab)=="sum")]="value"
+sgm_c=rbind(sgm_c,ab)
+sgm_c$cid_mod_group=as.factor(sgm_c$cid_mod_group)
 p<-ggplot()
 p + geom_line(data=sgm_c,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Clicks")+ggtitle("Sum of Clicks per date for each cid group analysis")
 ```
 <br/>
 
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
-sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
-sgm$value=round(as.numeric(as.character(sgm$value)),2)
 sgm_c1=sgm[sgm$variable=='t_nr',]
+ab1<-aggregate(sgm_c1$value,by=list(sgm_c1$dte),FUN=sum)
+ab1<-as.data.frame(ab1)
+colnames(ab1)<-c("dte","sum")
+ab1$cid_mod_group="abtestall"
+ab1$variable="t_nr"
+colnames(ab1)[which(colnames(ab1)=="sum")]="value"
+sgm_c1=rbind(sgm_c1,ab1)
+sgm_c1$cid_mod_group=as.factor(sgm_c1$cid_mod_group)
 p<-ggplot()
 p + geom_line(data=sgm_c1,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Net_Revenue")+ggtitle("Sum of Net Revenue per date for each cid group analysis")
 ```
 <br/>
 
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
-sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
-sgm$value=round(as.numeric(as.character(sgm$value)),2)
 sgm_c2=sgm[sgm$variable=='t_rev',]
+ab2<-aggregate(sgm_c2$value,by=list(sgm_c2$dte),FUN=sum)
+ab2<-as.data.frame(ab2)
+colnames(ab2)<-c("dte","sum")
+ab2$cid_mod_group="abtestall"
+ab2$variable="t_nr"
+colnames(ab2)[which(colnames(ab2)=="sum")]="value"
+sgm_c2=rbind(sgm_c2,ab2)
+sgm_c2$cid_mod_group=as.factor(sgm_c2$cid_mod_group)
 p<-ggplot()
 p + geom_line(data=sgm_c2,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Revenue")+ggtitle("Sum of Revenue per date for each cid group analysis")
 ```
 <br/>
 
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
-sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
-sgm$value=round(as.numeric(as.character(sgm$value)),2)
 sgm_c3=sgm[sgm$variable=='t_cost',]
+ab3<-aggregate(sgm_c3$value,by=list(sgm_c3$dte),FUN=sum)
+ab3<-as.data.frame(ab3)
+colnames(ab3)<-c("dte","sum")
+ab3$cid_mod_group="abtestall"
+ab3$variable="t_nr"
+colnames(ab3)[which(colnames(ab3)=="sum")]="value"
+sgm_c3=rbind(sgm_c3,ab3)
+sgm_c3$cid_mod_group=as.factor(sgm_c3$cid_mod_group)
 p<-ggplot()
 p + geom_line(data=sgm_c3,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Cost")+ggtitle("Sum of Cost per date for each cid group analysis")
 ```
 <br/>
 
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
-sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
-sgm$value=round(as.numeric(as.character(sgm$value)),2)
 sgm_c4=sgm[sgm$variable=='t_impr',]
+ab4<-aggregate(sgm_c4$value,by=list(sgm_c4$dte),FUN=sum)
+ab4<-as.data.frame(ab4)
+colnames(ab4)<-c("dte","sum")
+ab4$cid_mod_group="abtestall"
+ab4$variable="t_nr"
+colnames(ab4)[which(colnames(ab4)=="sum")]="value"
+sgm_c4=rbind(sgm_c4,ab4)
+sgm_c4$cid_mod_group=as.factor(sgm_c4$cid_mod_group)
 p<-ggplot()
 p + geom_line(data=sgm_c4,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Imressions")+ggtitle("Sum of Impressions per date for each cid group analysis")
 ```
@@ -57,17 +96,27 @@ p + geom_line(data=sgm_c4,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_gr
 
 
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
-sgm$cid_mod_group=as.factor(sgm$cid_mod_group)
-sgm$value=round(as.numeric(as.character(sgm$value)),2)
 sgm_c5=sgm[sgm$variable=='t_red',]
+ab5<-aggregate(sgm_c5$value,by=list(sgm_c5$dte),FUN=sum)
+ab5<-as.data.frame(ab5)
+colnames(ab5)<-c("dte","sum")
+ab5$cid_mod_group="abtestall"
+ab5$variable="t_nr"
+colnames(ab5)[which(colnames(ab5)=="sum")]="value"
+sgm_c5=rbind(sgm_c5,ab5)
+sgm_c5$cid_mod_group=as.factor(sgm_c5$cid_mod_group)
 p<-ggplot()
 p + geom_line(data=sgm_c5,aes(x=dte,y=value,group=cid_mod_group,color=cid_mod_group))+xlab("Date")+ylab("Sum of Redirects")+ggtitle("Sum of Redirects per date for each cid group analysis")
 ```
 <br/>
-<p><b><u> All mkt_id data</u></b></p>
+
+<p><b><u> DataFrame</u></b></p>
 ```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
 library(xtable)
+sg$cid_mod_group<-ifelse(sg$cid_mod_group=="0","quadractic",ifelse(sg$cid_mod_group=="1","quadratic_simulator","quadratic_synthscore"))
 x=sg
+colnames(ab5)[which(colnames(ab5)=="sum")]="value"
+colnames(x)[which(colnames(x)=="t_nr")]="total_netrev"
 cnames=colnames(x)
 x=t(x)
 x=apply(x,2,as.character)
@@ -77,3 +126,4 @@ x=as.data.frame(x)
 cnames->colnames(x)
 print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
 ```
+<br/>
