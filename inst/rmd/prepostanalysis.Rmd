@@ -12,32 +12,54 @@ ab3<-read.csv(paste(base_path,"querymanual",sep=""),sep="\t")
 
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
 #operations
-#new columns added
+ab3$period<-factor(ab3$period, levels=rev(levels(ab3$period)) )
 ab3$t_netrev<-ab3$t_rev-ab3$t_cost
 ab3$dte<-as.Date(as.character(ab3$dte))
 ab3$cid_mod_group<-ifelse(ab3$cid_mod_group=="0","quadratic",ifelse(ab3$cid_mod_group=="1","quadratic_simulator","quadratic_synthscore"))
 
 predata<-ab3[ab3$period=='PRE',]
 postdata<-ab3[ab3$period=='POST',]
-prenrevsum<-aggregate(predata$t_netrev,by=list(predata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_netrev")
-postnrevsum<-aggregate(postdata$t_netrev,by=list(postdata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_netrev")
-preimpsum<-aggregate(predata$t_impr,by=list(predata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_impressions")
-postimpsum<-aggregate(postdata$t_impr,by=list(postdata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_impressions")
-preclsum<-aggregate(predata$t_clicks,by=list(predata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_clicks")
-postclsum<-aggregate(postdata$t_clicks,by=list(postdata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_clicks")
-preredsum<-aggregate(predata$t_red,by=list(predata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_redirects")
-postredsum<-aggregate(postdata$t_red,by=list(postdata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_redirects")
+abrevsum<-aggregate(ab3$t_netrev,by=list(ab3$dte),FUN=sum);colnames(abrevsum)<-c("dte","sum_netrev")
+abcpcmean<-aggregate(ab3$avg_maxcpc,by=list(ab3$dte),FUN=mean);colnames(abcpcmean)<-c("dte","avg_max_cpc")
+abimpsum<-aggregate(ab3$t_impr,by=list(ab3$dte),FUN=sum);colnames(abimpsum)<-c("dte","sum_impressions")
+abclsum<-aggregate(ab3$t_clicks,by=list(ab3$dte),FUN=sum);colnames(abclsum)<-c("dte","sum_clicks")
+abredsum<-aggregate(ab3$t_red,by=list(ab3$dte),FUN=sum);colnames(abredsum)<-c("dte","sum_redirects")
 
-#plots
-plot(prenrevsum$dte,prenrevsum$sum_redirects,type="l",xlab="Day",ylab="Sum of Netrev",main="Pre Period sum of netrev per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
-plot(postnrevsum$Group.1,postnrevsum$x,type="l",xlab="Day",ylab="Sum of Netrev",main="Post Period sum of netrev per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
-plot(preimpsum$Group.1,preimpsum$x,type="l",xlab="Day",ylab="Sum of Impressions",main="Pre Period sum of impressions per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
-plot(postimpsum$Group.1,postimpsum$x,type="l",xlab="Day",ylab="Sum of Impressions",main="Post Period sum of impressions per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
-plot(preclsum$Group.1,preclsum$x,type="l",xlab="Day",ylab="Sum of Clicks",main="Pre Period sum of clicks per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
-plot(postclsum$Group.1,postclsum$x,type="l",xlab="Day",ylab="Sum of Clicks",main="Post Period sum of clicks per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
-plot(preredsum$Group.1,preredsum$x,type="l",xlab="Day",ylab="Sum of Redirects",main="Pre Period sum of redirects per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
-plot(postredsum$Group.1,postredsum$x,type="l",xlab="Day",ylab="Sum of Redirects",main="Post Period sum of redirects per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
+nrev<-tapply(ab3$t_netrev,ab3$period,sum)
+cpc<-tapply(ab3$avg_maxcpc,ab3$period,mean)
+imp<-tapply(ab3$t_impr,ab3$period,sum)
+cl<-tapply(ab3$t_clicks,ab3$period,sum)
+red<-tapply(ab3$t_red,ab3$period,sum)
+barplot(nrev,main="Sum of NetRev for Pre and Post A/B Test",ylab="sum of netrev")
+barplot(cpc,main="Average of maxcpc for Pre and Post A/B Test",ylab="avg cpc")
+barplot(imp,main="Sum of Impressions for Pre and Post A/B Test",ylab="sum of impressions")
+barplot(cl,main="Sum of Clicks for Pre and Post A/B Test",ylab="sum of clicks")
+barplot(red,main="Sum of Redirects for Pre and Post A/B Test",ylab="sum of redirects")
 
+plot(abrevsum$dte,abrevsum$sum_netrev,xlab="Date",ylab="Sum of Netrev",main=" Sum of NetRev per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3",type="l");grid(col="grey")
+abline(v=mean(ab3$dte))
+text(x =min(ab3$dte)+2,y=100,"Pre",pos=1,col="navyblue")
+text(x =max(ab3$dte)-2,y=100,"Post",pos=1,col="navyblue")
+
+plot(abcpcmean$dte,abcpcmean$avg_max_cpc,xlab="Date",ylab="Average max_cpc",main=" Average max_cpc per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3",type="l");grid(col="grey")
+abline(v=mean(ab3$dte))
+text(x =min(ab3$dte)+2,y=max(abcpcmean$avg_max_cpc)-0.1,"Pre",pos=1,col="navyblue")
+text(x =max(ab3$dte)-2,y=max(abcpcmean$avg_max_cpc)-0.1,"Post",pos=1,col="navyblue")
+
+plot(abimpsum$dte,abimpsum$sum_impressions,,xlab="Date",ylab="Sum of Impressions",main=" Sum of  Impressions per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3",type="l");grid(col="grey")
+abline(v=mean(ab3$dte))
+text(x =min(ab3$dte)+2,y=max(abimpsum$sum_impressions)-20000,"Pre",pos=1,col="navyblue")
+text(x =max(ab3$dte)-2,y=max(abimpsum$sum_impressions)-20000,"Post",pos=1,col="navyblue")
+
+plot(abclsum$dte,abclsum$sum_clicks,xlab="Date",ylab="Sum of Clicks",main=" Sum of Clicks per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3",type="l");grid(col="grey")
+abline(v=mean(ab3$dte))
+text(x =min(ab3$dte)+2,y=max(abclsum$sum_clicks)-200,"Pre",pos=1,col="navyblue")
+text(x =max(ab3$dte)-2,y=max(abclsum$sum_clicks)-200,"Post",pos=1,col="navyblue")
+
+plot(abredsum$dte,abredsum$sum_redirects,xlab="Date",ylab="Sum of Redirects",main="Sum of Redirects per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3",type="l");grid(col="grey")
+abline(v=mean(ab3$dte))
+text(x =min(ab3$dte)+2,y=max(abredsum$sum_redirects)-10,"Pre",pos=1,col="navyblue")
+text(x =max(ab3$dte)-2,y=max(abredsum$sum_redirects)-10,"Post",pos=1,col="navyblue")
 
 losspre<-predata[predata$t_netrev<0,]
 losspost<-postdata[postdata$t_netrev<0,]
@@ -45,7 +67,12 @@ losspre<-losspre[order(losspre$t_netrev),]
 losspost<-losspost[order(losspost$t_netrev),]
 toppreloss<-losspre[1:20,]
 toppostloss<-losspost[1:20,]
-
+profitpre<-predata[predata$t_netrev>0,]
+profitpost<-postdata[postdata$t_netrev>0,]
+profitpre<-profitpre[order(-(profitpre$t_netrev)),]
+profitpost<-profitpost[order(-(profitpost$t_netrev)),]
+topprofitpre<-profitpre[1:20,]
+topprofitpost<-profitpost[1:20,]
 ab3_quad<-ab3[ab3$cid_mod_group=='quadratic',]
 ab3_quad_loss<-ab3_quad[ab3_quad$t_netrev<0,]
 ab3_quad_loss_od<-ab3_quad_loss[order(ab3_quad_loss$t_netrev),]
@@ -121,6 +148,33 @@ print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
 ```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
 library(xtable)
 x=toploss_synth
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/>
+<p><b><u> Top 20 profit making cid for Pre A/B Test</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=topprofitpre
+cnames=colnames(x)
+x=t(x)
+x=apply(x,2,as.character)
+x=as.data.frame(x)
+x=t(x)
+x=as.data.frame(x)
+cnames->colnames(x)
+print(xtable(x,display=rep("s",dim(x)[2]+1)),type="html",include.rownames=FALSE)
+```
+<br/><p><b><u> Top 20 profit making cid for Post A/B Test</u></b></p>
+```{r results='asis',warning=FALSE,error=FALSE,echo=F,comment=NA,tidy = F}
+library(xtable)
+x=topprofitpost
 cnames=colnames(x)
 x=t(x)
 x=apply(x,2,as.character)
