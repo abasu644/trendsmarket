@@ -5,40 +5,42 @@ library(reshape2)
 #for UI use this else comment it
 base_path="/home/devtest/"
 #for local system use this else comment it
-# base_path="D:/Work/aug1stweek/"
-pt<-paste(base_path,"gfx_abtest_prepost_dtcid.txt",sep="")
-ab3<-read.csv(pt,sep="\t")
+#base_path="D:/Work/aug1stweek/"
+ab3<-read.csv(paste(base_path,"querymanual",sep=""),sep="\t")
+
 ```
 
 ```{r tidy=FALSE,warning=FALSE,comment=NA,message=FALSE,comment=NA,prompt=FALSE,collapse=FALSE,echo=FALSE}
 #operations
 #new columns added
 ab3$t_netrev<-ab3$t_rev-ab3$t_cost
+ab3$dte<-as.Date(as.character(ab3$dte))
 ab3$cid_mod_group<-ifelse(ab3$cid_mod_group=="0","quadratic",ifelse(ab3$cid_mod_group=="1","quadratic_simulator","quadratic_synthscore"))
+
 predata<-ab3[ab3$period=='PRE',]
 postdata<-ab3[ab3$period=='POST',]
-tapply(predata$t_clicks,predata$cid_mod_group,sum)
-tapply(postdata$t_clicks,postdata$cid_mod_group,sum)
-barplot(tapply(predata$t_netrev,predata$dte,sum),col=unique(predata$dte),main = "Netrev per date group for predata Analysis")
-barplot(tapply(postdata$t_netrev,postdata$dte,sum),col=unique(postdata$dte),main = "Netrev per date group for postdata Analysis")
-barplot(tapply(predata$t_clicks,predata$dte,sum),col=unique(predata$dte),main = "Clicks per date group for predata Analysis")
-barplot(tapply(postdata$t_clicks,postdata$dte,sum),col=unique(postdata$dte),main = "Clicks per date group for postdata Analysis")
-barplot(tapply(predata$t_impr,predata$dte,sum),col=unique(predata$dte),main = "Impressions per date group for predata Analysis")
-barplot(tapply(postdata$t_impr,postdata$dte,sum),col=unique(postdata$dte),main = "Impressions per date group for postdata Analysis")
-barplot(tapply(predata$t_red,predata$dte,sum),col=unique(predata$dte),main = "Redirects per date group for predata Analysis")
-barplot(tapply(postdata$t_red,postdata$dte,sum),col=unique(postdata$dte),main = "Redirects per date group for postdata Analysis")
-barplot(tapply(predata$t_netrev,predata$cid_mod_group,sum),col=unique(predata$dte),main = "Netrev per cid group for predata Analysis")
-barplot(tapply(postdata$t_netrev,postdata$cid_mod_group,sum),col=unique(postdata$dte),main = "Netrev per cid group for postdata Analysis")
-barplot(tapply(predata$t_clicks,predata$cid_mod_group,sum),main = "Clicks per cid group for predata Analysis",legend.text = "Clicks")
-barplot(tapply(postdata$t_clicks,postdata$cid_mod_group,sum),main = "Clicks per cid group for postdata Analysis",legend.text = "Clicks")
-barplot(tapply(predata$t_impr,predata$cid_mod_group,sum),main = "Impressions per cid group for predata Analysis",legend.text = "Impressions")
-barplot(tapply(postdata$t_impr,postdata$cid_mod_group,sum),main = "Impressions per cid group for postdata Analysis",legend.text = "Impressions")
-barplot(tapply(predata$t_red,predata$cid_mod_group,sum),main = "Redirects per cid group for predata Analysis",legend.text = "Redirects")
-barplot(tapply(postdata$t_red,postdata$cid_mod_group,sum),main = "Redirects per cid group for postdata Analysis",legend.text = "Redirects")
+prenrevsum<-aggregate(predata$t_netrev,by=list(predata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_netrev")
+postnrevsum<-aggregate(postdata$t_netrev,by=list(postdata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_netrev")
+preimpsum<-aggregate(predata$t_impr,by=list(predata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_impressions")
+postimpsum<-aggregate(postdata$t_impr,by=list(postdata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_impressions")
+preclsum<-aggregate(predata$t_clicks,by=list(predata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_clicks")
+postclsum<-aggregate(postdata$t_clicks,by=list(postdata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_clicks")
+preredsum<-aggregate(predata$t_red,by=list(predata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_redirects")
+postredsum<-aggregate(postdata$t_red,by=list(postdata$dte),FUN=sum);colnames(prenrevsum)<-c("dte","sum_redirects")
+
+#plots
+plot(prenrevsum$dte,prenrevsum$sum_redirects,type="l",xlab="Day",ylab="Sum of Netrev",main="Pre Period sum of netrev per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
+plot(postnrevsum$Group.1,postnrevsum$x,type="l",xlab="Day",ylab="Sum of Netrev",main="Post Period sum of netrev per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
+plot(preimpsum$Group.1,preimpsum$x,type="l",xlab="Day",ylab="Sum of Impressions",main="Pre Period sum of impressions per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
+plot(postimpsum$Group.1,postimpsum$x,type="l",xlab="Day",ylab="Sum of Impressions",main="Post Period sum of impressions per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
+plot(preclsum$Group.1,preclsum$x,type="l",xlab="Day",ylab="Sum of Clicks",main="Pre Period sum of clicks per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
+plot(postclsum$Group.1,postclsum$x,type="l",xlab="Day",ylab="Sum of Clicks",main="Post Period sum of clicks per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
+plot(preredsum$Group.1,preredsum$x,type="l",xlab="Day",ylab="Sum of Redirects",main="Pre Period sum of redirects per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
+plot(postredsum$Group.1,postredsum$x,type="l",xlab="Day",ylab="Sum of Redirects",main="Post Period sum of redirects per day analysis",font=2,family="mono",lty=4,col.lab="Blue",col="red",col.main="tan3")
+
+
 losspre<-predata[predata$t_netrev<0,]
 losspost<-postdata[postdata$t_netrev<0,]
-losspre<-subset(losspre, !duplicated(losspre[,2]))
-losspost<-subset(losspost, !duplicated(losspost[,2]))
 losspre<-losspre[order(losspre$t_netrev),]
 losspost<-losspost[order(losspost$t_netrev),]
 toppreloss<-losspre[1:20,]
@@ -46,19 +48,16 @@ toppostloss<-losspost[1:20,]
 
 ab3_quad<-ab3[ab3$cid_mod_group=='quadratic',]
 ab3_quad_loss<-ab3_quad[ab3_quad$t_netrev<0,]
-ab3_quad_loss<-subset(ab3_quad_loss, !duplicated(ab3_quad_loss[,2]))
 ab3_quad_loss_od<-ab3_quad_loss[order(ab3_quad_loss$t_netrev),]
 toploss_quad<-ab3_quad_loss_od[1:20,]
 
 ab3_sim<-ab3[ab3$cid_mod_group=='quadratic_simulator',]
 ab3_sim_loss<-ab3_sim[ab3_sim$t_netrev<0,]
-ab3_sim_loss <- subset(ab3_sim_loss, !duplicated(ab3_sim_loss[,2])) 
 ab3_sim_loss_od<-ab3_sim_loss[order(ab3_sim_loss$t_netrev),]
 toploss_sim<-ab3_sim_loss_od[1:20,]
 
 ab3_synth<-ab3[ab3$cid_mod_group=='quadratic_synthscore',]
 ab3_synth_loss<-ab3_synth[ab3_synth$t_netrev<0,]
-ab3_synth_loss <- subset(ab3_synth_loss, !duplicated(ab3_synth_loss[,2])) 
 ab3_synth_loss_od<-ab3_synth_loss[order(ab3_synth_loss$t_netrev),]
 toploss_synth<-ab3_synth_loss_od[1:20,]
 ```
