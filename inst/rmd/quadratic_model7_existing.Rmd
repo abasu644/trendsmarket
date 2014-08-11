@@ -42,7 +42,7 @@ dndf=dndf[order(dndf$dte),]
  dndf[,!(colnames(dndf) %in% c("dte"))]=apply(dndf[,!(colnames(dndf) %in% c("dte"))],2,as.numeric)
 
 
- run.date = as.Date("3015-06-02")
+ run.date = as.Date("2014-06-02")
  cnm=colnames(read.csv(paste(base_path,"data.csv",sep=""),sep="\t"))
  a=system(paste("grep ",  mktid, paste(" ",base_path,"run_data.tsv",sep=""),sep=""),intern=T,ignore.stderr=T)
  alltraffic.df=as.data.frame( t(sapply(1:length(a), function(x) strsplit(a, "\t")[[x]])) ) 
